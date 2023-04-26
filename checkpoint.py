@@ -21,22 +21,22 @@ class Checkpoint:
         }
 
         # Logging
-        self._SAVE_CKPT_MSG = "Saving model checkpoint @ Epoch = {epoch}, Training Loss = {loss}"
-        self._LOAD_CKPT_MSG = "Model Loaded from checkpoint @ Epoch = {epoch}, Training Loss = {loss}"
+        self._SAVE_CKPT_MSG = "Saving model checkpoint @ Epoch = {epoch}, Training Loss = {loss}, Path = {path}"
+        self._LOAD_CKPT_MSG = "Model Loaded from checkpoint @ Epoch = {epoch}, Training Loss = {loss}, Path = {path}"
         self.logger = logging.getLogger(__name__)
         self.logger.disabled = not enable_logging
 
     def save(self, epoch, loss):
         self.checkpoint_dict['epoch'] = epoch
         self.checkpoint_dict['loss'] = loss
-        self.logger.info(self._SAVE_CKPT_MSG.format(epoch=epoch, loss=loss))
+        self.logger.info(self._SAVE_CKPT_MSG.format(epoch=epoch, loss=loss, path=self.path))
         torch.save(self.checkpoint_dict, self.path)
 
     def load(self):
         self.checkpoint_dict = torch.load(self.path)
         self.model.load_state_dict(self.checkpoint_dict['model_state_dict'])
         self.optimizer.load_state_dict(self.checkpoint_dict['optimizer_state_dict'])
-        self.logger.info(self._LOAD_CKPT_MSG.format(epoch=self.epoch(), loss=self.loss()))
+        self.logger.info(self._LOAD_CKPT_MSG.format(epoch=self.epoch(), loss=self.loss(), path=self.path))
 
     def epoch(self):
         return self.checkpoint_dict['epoch']
